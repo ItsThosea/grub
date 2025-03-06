@@ -16,6 +16,7 @@
  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <grub/time.h>
 #include <grub/cryptodisk.h>
 #include <grub/types.h>
 #include <grub/misc.h>
