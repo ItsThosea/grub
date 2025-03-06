@@ -1207,6 +1207,7 @@ module = {
 module = {
   name = cryptodisk;
   common = disk/cryptodisk.c;
+  enable = pci;
 };
 
 module = {
