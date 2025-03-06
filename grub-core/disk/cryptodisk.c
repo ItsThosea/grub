@@ -16,6 +16,7 @@
  *  along with GRUB.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <grub/random.h>
 #include <grub/cryptodisk.h>
 #include <grub/env.h>
 #include <grub/mm.h>
@@ -1244,8 +1245,8 @@ grub_cryptodisk_scan_device_real (const char *name,
 
           if (first)
             {
-               grub_uint64_t time = grub_get_time_ms ();
-               if (time % 5 == 0)
+               grub_uint8_t random_byte;
+               if (grub_crypto_get_random(&random_byte, sizeof(random_byte)) == GRUB_ERR_NONE || random_byte % 2 != 0)
                  grub_printf_ (N_("Cannot boot: no efi on disk %s"), dev->uuid);
                else
                  grub_printf_ (N_("Invalid boot target. Please reboot."));
