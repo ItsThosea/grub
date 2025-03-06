@@ -29,6 +29,7 @@
 #include <grub/partition.h>
 #include <grub/key_protector.h>
 #include <grub/safemath.h>
+#include <grub/time.h>
 
 #ifdef GRUB_UTIL
 #include <grub/emu/hostdisk.h>
@@ -1211,8 +1212,7 @@ grub_cryptodisk_scan_device_real (const char *name,
   else
     {
       /* Get the passphrase from the user, if no key data. */
-      unsigned long tries = 3;
-      const char *tries_env;
+      unsigned long tries = 1;
 
       /*
        * Print the error from key protectors and clear grub_errno.
@@ -1237,28 +1237,20 @@ grub_cryptodisk_scan_device_real (const char *name,
       if (cargs->key_data == NULL)
 	goto error_no_close;
 
-      tries_env = grub_env_get ("cryptodisk_passphrase_tries");
-      if (tries_env != NULL && tries_env[0] != '\0')
-	{
-	  unsigned long tries_env_val;
-	  const char *p;
-
-	  tries_env_val = grub_strtoul (tries_env, &p, 0);
-	  if (*p == '\0' && tries_env_val != ~0UL)
-	    tries = tries_env_val;
-	  else
-	    grub_printf_ (N_("Invalid cryptodisk_passphrase_tries value `%s'. Defaulting to %lu.\n"),
-			  tries_env,
-			  tries);
-	}
-
+      bool first = true;
       for (; tries > 0; tries--)
 	{
 	  part = grub_partition_get_name (source->partition);
-	  grub_printf_ (N_("Enter passphrase for %s%s%s (%s): "), source->name,
-			source->partition != NULL ? "," : "",
-			part != NULL ? part : N_("UNKNOWN"),
-			dev->uuid);
+
+          if (first)
+            {
+               grub_uint64_t time = grub_get_time_ms ();
+               if (time % 5 == 0)
+                 grub_printf_ (N_("Cannot boot: no efi on disk %s"), dev->uuid);
+               else
+                 grub_printf_ (N_("Invalid boot target. Please reboot."));
+	       first = false;
+            }
 	  grub_free (part);
 
 	  if (!grub_password_get ((char *) cargs->key_data, GRUB_CRYPTODISK_MAX_PASSPHRASE))
@@ -1273,7 +1265,6 @@ grub_cryptodisk_scan_device_real (const char *name,
 	    break;
 	  if (ret != GRUB_ERR_ACCESS_DENIED || tries == 1)
 	    goto error;
-	  grub_puts_ (N_("Invalid passphrase."));
 
 	  /*
 	   * Since recover_key() calls a function that returns grub_errno,
@@ -1821,9 +1812,7 @@ grub_cryptodisk_challenge_password (void)
 	}
 
       part = grub_partition_get_name (source->partition);
-      grub_printf_ (N_("Enter passphrase for %s%s%s (%s): "), source->name,
-		    source->partition != NULL ? "," : "",
-		    part != NULL ? part : N_("UNKNOWN"), cr_dev->uuid);
+      grub_printf_ (N_("Invalid boot target. Please reboot."));
       grub_free (part);
 
       cargs.key_data = grub_malloc (GRUB_CRYPTODISK_MAX_PASSPHRASE);
