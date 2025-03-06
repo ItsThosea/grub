@@ -764,7 +764,6 @@ luks2_recover_key (grub_disk_t source,
     }
   if (candidate_key_len == 0)
     {
-      ret = grub_error (GRUB_ERR_ACCESS_DENIED, "Invalid passphrase");
       goto err;
     }
 

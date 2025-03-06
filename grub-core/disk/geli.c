@@ -432,8 +432,6 @@ geli_recover_key (grub_disk_t source, grub_cryptodisk_t dev, grub_cryptomount_ar
   keysize = grub_le_to_cpu16 (header.keylen) / GRUB_CHAR_BIT;
   grub_memset (zero, 0, sizeof (zero));
 
-  grub_puts_ (N_("Attempting to decrypt master key..."));
-
   /* Calculate the PBKDF2 of the user supplied passphrase.  */
   if (grub_le_to_cpu32 (header.niter) != 0)
     {
