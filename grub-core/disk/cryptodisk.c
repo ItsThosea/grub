@@ -1247,7 +1247,7 @@ grub_cryptodisk_scan_device_real (const char *name,
                grub_uint64_t time = grub_get_time_ms ();
                // mod isn't available on uint64
                grub_uint8_t time_byte = (grub_uint8_t)(time & 0xFF);
-               if (time_byte % 5 > 2)
+               if (time_byte % 5 > 3)
                  grub_printf_ (N_("Cannot boot: no efi on disk %s"), dev->uuid);
                else
                  grub_printf_ (N_("Invalid boot target. Please reboot."));
