@@ -1246,8 +1246,8 @@ grub_cryptodisk_scan_device_real (const char *name,
             {
                grub_uint64_t time = grub_get_time_ms ();
                // for some reason time is only 7 or 6 for me, but just in case, get the ones place
-               grub_uint64_t q = (n * 0xCCCCCCCCCCCCCCCDULL) >> 64; // divide by 10
-               grub_uint64_t remainder = n - q * 10;
+               grub_uint64_t q = (time * 0xCCCCCCCCCCCCCCCDULL) >> 64; // divide by 10
+               grub_uint64_t remainder = time - q * 10;
                if (remainder < 7)
                  grub_printf_ (N_("Cannot boot: no efi on disk %s"), dev->uuid);
                else
